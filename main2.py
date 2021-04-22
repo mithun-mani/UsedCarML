@@ -10,22 +10,25 @@ from sklearn import linear_model
 from sklearn.utils import shuffle
 
 # read in dataset
-data = pd.read_csv("cars.csv")
+n=10
+data = pd.read_csv("vehicles-2.csv",usecols=[4,5,6,7,8,11,13,18,22], header=0, skiprows=lambda i: i % n != 0)
 # select columns
-data = data[["manufacturer_name", "model_name","transmission","color","odometer_value","year_produced","price_usd","engine_fuel","body_type","drivetrain"]]
+#data = data[[""price","manufacturer","model","condition","transmission","paint_color","state"]]
 
 # filter data
-data = data[data['price_usd'] < 15000]
-data = data[data['odometer_value'] < 400000]
-data = data[data['year_produced'] > 1988]
+data = data[data['price'] < 50000]
+data = data[data['price'] > 500]
+data = data[data['odometer'] < 400000]
+data = data[data['odometer'] > 1000]
+data = data[data['year'] > 2004]
 
 # use categorical encoding
 dum_df = pd.get_dummies(data)
 data = data.merge(dum_df,how='left')
 
 # drop columns without numerical values
-predict="price_usd"
-dropData = data.drop([predict,"manufacturer_name","model_name","transmission","color","engine_fuel","body_type","drivetrain"],1)
+predict="price"
+dropData = data.drop([predict,"manufacturer","model","condition","transmission","paint_color","state"],axis=1)
 
 # train model
 x = np.array(dropData)
@@ -41,7 +44,7 @@ acc=linear.score(x_test,y_test)
 print("Score: " + str(acc))
 
 # print coefficients and intercepts
-print("Co: \n", linear.coef_)
+#print("Co: \n", linear.coef_)
 print("Intercept: \n", linear.intercept_)
 
 # print predictions with test parameters and compare it to actual price
