@@ -1,19 +1,15 @@
-"""
-Mithun Manivannan
-CS 370 Project
-Predicting Used Car Values Using Machine Learning
-"""
 import pandas as pd
 import numpy as np
+import xgboost as xgb
 import sklearn
 from sklearn import linear_model
+from sklearn.metrics import explained_variance_score
+from sklearn.ensemble import RandomForestRegressor
+import time
+start_time = time.time()
 import locale
 locale.setlocale( locale.LC_ALL, 'en_CA.UTF-8' )
 
-
-import time
-start_time = time.time()
-# read in dataset
 n=10
 data = pd.read_csv("vehicles-2.csv",usecols=[4,5,6,7,11,13,18,22], header=0, skiprows=lambda i: i % n != 0)
 #data = pd.read_csv("vehicles-2.csv",usecols=[4,5,6,7,9,10,11,15], header=0, skiprows=lambda i: i % n != 0)
@@ -40,13 +36,12 @@ x = np.array(dropData)
 y = np.array(data[predict])
 x_train,x_test,y_train,y_test = sklearn.model_selection.train_test_split(x,y,test_size=0.2)
 
-# create linear model and fit
-linear = linear_model.LinearRegression()
-linear.fit(x_train,y_train)
+rf = RandomForestRegressor(n_estimators = 10, random_state = 42)
 
-# calculate score for linear fit
-acc=linear.score(x_test,y_test)
+rf.fit(x_train, y_train)
+acc=rf.score(x_test,y_test)
 print("Score: " + str(acc))
+
 print("--- %s seconds ---" % (time.time() - start_time))
 
 # print predictions with test parameters and compare it to actual price
@@ -81,7 +76,7 @@ while(True):
         addArray[dropData.columns.get_loc(place)] = 1
         addArray[dropData.columns.get_loc(type)] = 1
 
-        predictions=linear.predict([addArray])
+        predictions=rf.predict([addArray])
     except KeyError:
         print("Invalid data. Please try Again\n\n\n")
         continue
@@ -96,4 +91,6 @@ while(True):
         continue
     elif repeat == 0:
         break
+
+
 
